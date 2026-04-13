@@ -1,35 +1,164 @@
 @import "tailwindcss";
 
+/* Theme variables and neumorphism styles */
+:root,
+[data-theme="dark"]n {
+}
+
+/* Dark theme (default) */
+[data-theme="dark"] {
+  /* Brand: Yellow + Black-Dark */
+  --brand-bg: #070707;           /* Black-Dark */
+  --brand-surface: #0f0f10;
+  --brand-text: #f8f7f1;         /* Light-White */
+  --brand-muted: #BFB7A6;
+  --brand-primary: #FFD400;      /* Yellow (primary) */
+  --brand-primary-dark: #B78F00; /* Dark Yellow (accent) */
+  --shadow-dark: rgba(0,0,0,0.45);
+  --shadow-light: rgba(255,255,255,0.06);
+  --accent-ring: rgba(255,212,0,0.14);
+  /* compatibility aliases used in components */
+  --bg: var(--brand-bg);
+  --surface: var(--brand-surface);
+  --text: var(--brand-text);
+  --muted: var(--brand-muted);
+  --accent: var(--brand-primary);
+  --accent-dark: var(--brand-primary-dark);
+}
+
+/* Warm / Light theme variant */
+[data-theme="warm"] {
+  --brand-bg: #FBF9F4;           /* Light-White */
+  --brand-surface: #FFFDF7;
+  --brand-text: #0B0B0B;         /* Dark text for light theme */
+  --brand-muted: #6b5e3b;
+  --brand-primary: #FFD400;
+  --brand-primary-dark: #C9A300;
+  --shadow-dark: rgba(0,0,0,0.08);
+  --shadow-light: rgba(255,255,255,0.95);
+  --accent-ring: rgba(201,163,0,0.12);
+  --bg: var(--brand-bg);
+  --surface: var(--brand-surface);
+  --text: var(--brand-text);
+  --muted: var(--brand-muted);
+  --accent: var(--brand-primary);
+  --accent-dark: var(--brand-primary-dark);
+}
+
 @layer base {
+  /* spacing tokens */
+  :root {
+    --space-sm: 0.4rem;
+    --space-md: 0.75rem;
+    --space-lg: 1.125rem;
+    --card-padding: var(--space-md);
+  }
+  html { font-size: 14px; }
   body {
-    @apply bg-black text-slate-100 selection:bg-indigo-500/30 font-sans;
-    background-image: 
-      radial-gradient(circle at 50% 10%, rgba(99, 102, 241, 0.08) 0%, transparent 40%),
-      radial-gradient(circle at 90% 80%, rgba(168, 85, 247, 0.08) 0%, transparent 40%);
+    background: var(--bg);
+    color: var(--text);
+    font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
-  /* Custom Scrollbar */
-  ::-webkit-scrollbar {
-    width: 6px;
+  /* Neumorphism helpers */
+  .neumorph {
+    background: var(--surface);
+    border-radius: 16px;
+    box-shadow: 6px 6px 18px var(--shadow-dark), -6px -6px 18px var(--shadow-light);
+    padding: var(--card-padding);
   }
-  ::-webkit-scrollbar-track {
-    @apply bg-transparent;
+  .neumorph-sm {
+    border-radius: 12px;
+    box-shadow: 4px 4px 12px var(--shadow-dark), -4px -4px 12px var(--shadow-light);
   }
-  ::-webkit-scrollbar-thumb {
-    @apply bg-slate-800 rounded-full hover:bg-slate-700;
+  .neumorph-inset {
+    box-shadow: inset 6px 6px 12px var(--shadow-dark), inset -6px -6px 12px var(--shadow-light);
   }
+
+  /* Accent helpers */
+  .accent { color: var(--accent); }
+  .accent-bg { background: var(--accent); color: var(--bg); }
+  .accent-border { border-color: var(--accent-dark); }
+
+  /* Buttons */
+  .btn-neu {
+    background: var(--surface);
+    color: var(--text);
+    border-radius: 10px;
+    padding: 0.5rem 0.9rem;
+    box-shadow: 6px 6px 14px var(--shadow-dark), -6px -6px 14px var(--shadow-light);
+  }
+
+  /* Brand buttons and badges */
+  .btn-primary {
+    background: var(--accent);
+    color: var(--bg);
+    border-radius: 10px;
+    padding: 0.5rem 0.9rem;
+    font-weight: 700;
+    border: 1px solid var(--accent-dark);
+    box-shadow: 0 6px 14px rgba(0,0,0,0.25);
+  }
+
+  /* Focus styles for primary interactive elements */
+  .btn-primary:focus, .btn-primary:focus-visible,
+  .btn-neu:focus, .btn-neu:focus-visible,
+  .btn-outline:focus, .btn-outline:focus-visible,
+  .focus-accent:focus, .focus-accent:focus-visible,
+  input:focus, textarea:focus, select:focus, button:focus {
+    outline: none;
+    box-shadow: 0 10px 30px var(--accent-ring), 0 0 0 4px var(--accent-ring);
+    border-color: var(--accent-dark);
+  }
+
+  .btn-outline {
+    background: transparent;
+    color: var(--accent);
+    border: 1px solid var(--accent);
+    border-radius: 10px;
+    padding: 0.4rem 0.8rem;
+  }
+
+  .badge {
+    display: inline-block;
+    padding: 0.25rem 0.6rem;
+    border-radius: 9999px;
+    font-weight: 700;
+    background: var(--accent);
+    color: var(--bg);
+    border: 1px solid var(--accent-dark);
+    font-size: 12px;
+  }
+
+  .badge-soft {
+    background: color-mix(in srgb, var(--accent) 12%, transparent);
+    color: var(--accent-dark);
+    border-radius: 9999px;
+    padding: 0.2rem 0.5rem;
+    font-weight: 700;
+    border: 1px solid color-mix(in srgb, var(--accent-dark) 12%, transparent);
+    font-size: 12px;
+  }
+
+  /* Simple scrollbar matching theme */
+  ::-webkit-scrollbar { width: 8px; height: 8px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.25); border-radius: 8px; }
+
+  /* Focus utility using brand accent */
+  .focus-accent { transition: box-shadow .12s ease, border-color .12s ease; }
+  .focus-accent:focus, .focus-accent:focus-visible {
+    outline: none;
+    box-shadow: 0 8px 24px var(--accent-ring), 0 0 0 4px var(--accent-ring);
+    border-color: var(--accent-dark);
+  }
+
+  /* Table rhythm / spacing */
+  table { width: 100%; border-collapse: separate; }
+  table th, table td { padding: 0.75rem 1rem; vertical-align: middle; }
 }
 
-.bg-grid-slate-900\/40 {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' width='32' height='32' fill='none' stroke='rgb(15 23 42 / 0.4)'%3E%3Cpath d='M0 .5H31.5V32'/%3E%3C/svg%3E");
-}
-
-@keyframes scan {
-  0% { transform: translateY(-100%); opacity: 0; }
-  50% { opacity: 0.5; }
-  100% { transform: translateY(100%); opacity: 0; }
-}
-
-.animate-scan {
-  animation: scan 3s linear infinite;
-}
+/* Utility used across layout where subtle backgrounds were used */
+.surface-muted { background: rgba(0,0,0,0.06); }

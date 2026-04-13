@@ -1,62 +1,84 @@
-import React from 'react';
-import { Chart as ChartJS, ArcElement, Tooltip, Legend, CategoryScale, LinearScale, PointElement, LineElement, Title } from 'chart.js';
-import { Doughnut, Line } from 'react-chartjs-2';
+import React, { useMemo } from 'react';
+import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
+import { Doughnut } from 'react-chartjs-2';
 
-ChartJS.register(
-  ArcElement, Tooltip, Legend, 
-  CategoryScale, LinearScale, PointElement, LineElement, Title
-);
+ChartJS.register(ArcElement, Tooltip, Legend);
+
+// Center text plugin to render total in middle
+const centerText = {
+  id: 'centerText',
+  beforeDraw(chart) {
+    const { ctx, chartArea: { width, height } } = chart;
+    ctx.save();
+    const total = chart.config._config._data.datasets[0]?.data.reduce((a,b) => a + b, 0) || 0;
+    ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--text') || '#fff';
+    ctx.font = '600 18px system-ui, -apple-system, Roboto, "Helvetica Neue", Arial';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(`$${total.toFixed(2)}`, chart.width / 2, chart.height / 2);
+    ctx.restore();
+  }
+};
+
+ChartJS.register(centerText);
 
 const SpendChart = ({ expenses }) => {
-  const categoryData = expenses.reduce((acc, exp) => {
-    acc[exp.category] = (acc[exp.category] || 0) + exp.amount;
-    return acc;
-  }, {});
+  const categoryData = useMemo(() => {
+    return expenses.reduce((acc, exp) => {
+      acc[exp.category] = (acc[exp.category] || 0) + Number(exp.amount);
+      return acc;
+    }, {});
+  }, [expenses]);
+
+  const labels = Object.keys(categoryData);
+  const values = Object.values(categoryData);
+
+  // Palettes of yellow shades
+  const paletteOuter = ['#FFEDB5', '#FFE7A8', '#FFE28B', '#FFD95E', '#FFD24D', '#E6B800'];
+  const paletteMid = ['#FFF7D6', '#FFF2C8', '#FFEBA6', '#FFE38A', '#FFDB6D', '#D4A800'];
+  const paletteInner = ['#FFFCEB', '#FFF9E2', '#FFF5D0', '#FFEFBA', '#FFEAA8', '#CFA500'];
 
   const doughnutData = {
-    labels: Object.keys(categoryData),
-    datasets: [{
-      label: 'Spending by Category',
-      data: Object.values(categoryData),
-      backgroundColor: [
-        'rgba(99, 102, 241, 0.8)',
-        'rgba(168, 85, 247, 0.8)',
-        'rgba(236, 72, 153, 0.8)',
-        'rgba(248, 113, 113, 0.8)',
-        'rgba(45, 212, 191, 0.8)',
-        'rgba(251, 191, 36, 0.8)',
-      ],
-      borderColor: 'rgba(15, 23, 42, 1)',
-      borderWidth: 2,
-    }]
+    labels,
+    datasets: [
+      {
+        label: 'inner',
+        data: values,
+        backgroundColor: labels.map((_, i) => paletteInner[i % paletteInner.length]),
+        borderColor: 'rgba(0,0,0,0.06)',
+        borderWidth: 1
+      },
+      {
+        label: 'mid',
+        data: values.map(v => v * 0.7),
+        backgroundColor: labels.map((_, i) => paletteMid[i % paletteMid.length]),
+        borderColor: 'rgba(0,0,0,0.06)',
+        borderWidth: 1
+      },
+      {
+        label: 'outer',
+        data: values.map(v => v * 0.4),
+        backgroundColor: labels.map((_, i) => paletteOuter[i % paletteOuter.length]),
+        borderColor: 'rgba(0,0,0,0.06)',
+        borderWidth: 1
+      }
+    ]
   };
 
   const options = {
     plugins: {
-      legend: {
-        position: 'bottom',
-        labels: {
-          color: '#94a3b8',
-          font: { family: 'ui-sans-serif', weight: 'bold', size: 10 },
-          usePointStyle: true,
-          padding: 20
-        }
-      },
-      tooltip: {
-        backgroundColor: 'rgba(15, 23, 42, 0.9)',
-        padding: 12,
-        titleColor: '#e2e8f0',
-        bodyColor: '#6366f1',
-        usePointStyle: true
-      }
+      legend: { display: false },
+      tooltip: { enabled: true }
     },
-    cutout: '70%',
+    cutout: '60%',
     maintainAspectRatio: false
   };
 
   return (
-    <div className="h-full min-h-[300px] flex items-center justify-center">
-      <Doughnut data={doughnutData} options={options} />
+    <div className="h-full min-h-[320px] flex items-center justify-center">
+      <div className="w-full h-[360px] max-w-[680px] neumorph p-4">
+        <Doughnut data={doughnutData} options={options} />
+      </div>
     </div>
   );
 };

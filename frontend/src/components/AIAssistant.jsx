@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { askAI } from '../services/api';
+import { Send } from 'lucide-react';
 
 const AIAssistant = () => {
   const [messages, setMessages] = useState([
@@ -47,7 +48,7 @@ const AIAssistant = () => {
           <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
             <div className={`max-w-[80%] px-6 py-4 rounded-2xl ${
               msg.role === 'user' 
-                ? 'bg-indigo-600 text-white rounded-tr-none' 
+                ? 'accent-bg rounded-tr-none' 
                 : 'bg-slate-800 border border-slate-700 text-slate-200 rounded-tl-none'
             } shadow-lg transition-all animate-in slide-in-from-bottom-2`}>
               <p className="text-sm leading-relaxed">{msg.content}</p>
@@ -58,9 +59,9 @@ const AIAssistant = () => {
           <div className="flex justify-start">
             <div className="bg-slate-800 border border-slate-700 p-4 rounded-2xl rounded-tl-none animate-pulse">
               <div className="flex gap-2">
-                <div className="w-2 h-2 bg-indigo-500 rounded-full animate-bounce"></div>
-                <div className="w-2 h-2 bg-indigo-500 rounded-full animate-bounce [animation-delay:0.2s]"></div>
-                <div className="w-2 h-2 bg-indigo-500 rounded-full animate-bounce [animation-delay:0.4s]"></div>
+                <div className="w-2 h-2 rounded-full animate-bounce" style={{ background: 'var(--accent)' }}></div>
+                <div className="w-2 h-2 rounded-full animate-bounce" style={{ background: 'var(--accent)', animationDelay: '0.2s' }}></div>
+                <div className="w-2 h-2 rounded-full animate-bounce" style={{ background: 'var(--accent)', animationDelay: '0.4s' }}></div>
               </div>
             </div>
           </div>
@@ -73,7 +74,7 @@ const AIAssistant = () => {
         <div className="relative flex items-center">
           <input
             type="text"
-            className="w-full bg-slate-800 border border-slate-700 rounded-2xl px-6 py-4 pr-16 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all text-slate-100 placeholder-slate-500 shadow-inner"
+            className="w-full bg-slate-800 border border-slate-700 rounded-2xl px-6 py-4 pr-16 focus-accent transition-all text-slate-100 placeholder-slate-500 shadow-inner"
             placeholder="Ask your AI assistant..."
             value={input}
             onChange={(e) => setInput(e.target.value)}
@@ -82,9 +83,9 @@ const AIAssistant = () => {
           <button
             type="submit"
             disabled={loading}
-            className="absolute right-3 p-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl transition-all active:scale-95 shadow-lg disabled:opacity-50"
+            className="absolute right-3 p-2 btn-primary transition-all active:scale-95 shadow-lg disabled:opacity-50"
           >
-            {loading ? '...' : <span className="text-xl">🚀</span>}
+            {loading ? '...' : <Send className="w-5 h-5" />}
           </button>
         </div>
         <p className="text-[10px] text-slate-600 mt-3 text-center uppercase tracking-widest font-bold">
