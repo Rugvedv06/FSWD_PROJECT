@@ -3,9 +3,14 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
+// Featherless AI uses OpenAI-compatible SDK
 const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
+  apiKey: process.env.FEATHERLESS_API_KEY,
+  baseURL: 'https://api.featherless.ai/v1',
 });
+
+// Use a high-quality model available on Featherless (e.g., Llama 3 or similar)
+const DEFAULT_MODEL = process.env.FEATHERLESS_MODEL || "meta-llama/Llama-3-8b-instruct";
 
 /**
  * Generate financial advice based on expenses and budget
@@ -21,7 +26,7 @@ export const getFinancialAdvice = async (expenses, monthlyIncome, query) => {
     Focus on behavioral patterns and actionable steps.`;
 
     const response = await openai.chat.completions.create({
-      model: "gpt-3.5-turbo",
+      model: DEFAULT_MODEL,
       messages: [
         { role: "system", content: systemPrompt },
         { role: "user", content: query }
@@ -32,8 +37,8 @@ export const getFinancialAdvice = async (expenses, monthlyIncome, query) => {
 
     return response.choices[0].message.content;
   } catch (error) {
-    console.error('OpenAI Error:', error);
-    return "I'm having trouble connecting to my financial intelligence core. Please check your API key.";
+    console.error('Featherless AI Error:', error);
+    return "I'm having trouble connecting to my financial intelligence core. Please check your Featherless API key and connection.";
   }
 };
 
@@ -62,14 +67,14 @@ export const getSpendingAnalysis = async (expenses, monthlyIncome) => {
     RETURN ONLY RAW JSON.`;
 
     const response = await openai.chat.completions.create({
-      model: "gpt-3.5-turbo",
+      model: DEFAULT_MODEL,
       messages: [{ role: "system", content: systemPrompt }],
       response_format: { type: "json_object" },
     });
 
     return JSON.parse(response.choices[0].message.content);
   } catch (error) {
-    return { personality: "The Stealth Saver", prediction: monthlyIncome * 0.8, riskLevel: "LOW", advice: "Connection to AI brain lost. Stay frugal." };
+    return { personality: "The Stealth Saver", prediction: (monthlyIncome * 0.8).toFixed(2), riskLevel: "LOW", advice: "Connection to neural brain lost. Stay frugal." };
   }
 };
 
@@ -91,7 +96,7 @@ export const checkAffordability = async (amount, category, expenses, monthlyInco
     Give a 'YES', 'NO', or 'CAUTION' verdict followed by a 1-sentence explanation.`;
 
     const response = await openai.chat.completions.create({
-      model: "gpt-3.5-turbo",
+      model: DEFAULT_MODEL,
       messages: [{ role: "system", content: systemPrompt }],
       temperature: 0.5,
     });
