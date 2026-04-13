@@ -17,14 +17,13 @@ app.get('/api/health', (req, res) => {
 });
 
 // Import Routes
-// TODO: Placeholder for Route imports
+import expenseRoutes from './routes/expenseRoutes.js';
+import aiRoutes from './routes/aiRoutes.js';
 // import userRoutes from './routes/userRoutes.js';
-// import expenseRoutes from './routes/expenseRoutes.js';
-// import aiRoutes from './routes/aiRoutes.js';
 
+app.use('/api/expenses', expenseRoutes);
+app.use('/api/ai', aiRoutes);
 // app.use('/api/users', userRoutes);
-// app.use('/api/expenses', expenseRoutes);
-// app.use('/api/ai', aiRoutes);
 
 const startServer = async () => {
   await connectDB();

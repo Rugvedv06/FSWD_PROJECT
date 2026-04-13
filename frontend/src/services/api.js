@@ -22,6 +22,7 @@ export const deleteExpense = (id) => api.delete(`/expenses/${id}`);
 
 // AI Services
 export const askAI = (query) => api.post('/ai/chat', { query });
+export const getAIAnalysis = () => api.get('/ai/analysis');
 export const getAIPrediction = () => api.get('/ai/predict');
 
 export default api;
