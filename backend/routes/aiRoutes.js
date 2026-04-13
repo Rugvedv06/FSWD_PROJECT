@@ -1,5 +1,5 @@
 import express from 'express';
-import { chatWithAI, predictAffordability } from '../controllers/aiController.js';
+import { chatWithAI, predictAffordability, analyzeSpending } from '../controllers/aiController.js';
 
 const router = express.Router();
 

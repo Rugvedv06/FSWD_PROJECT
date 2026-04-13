@@ -1,11 +1,17 @@
 import OpenAI from 'openai';
 import dotenv from 'dotenv';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
-dotenv.config();
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+dotenv.config({ path: path.join(__dirname, '../.env') });
 
 // Featherless AI uses OpenAI-compatible SDK
+console.log('Featherless Key exists:', !!process.env.FEATHERLESS_API_KEY);
 const openai = new OpenAI({
-  apiKey: process.env.FEATHERLESS_API_KEY,
+  apiKey: process.env.FEATHERLESS_API_KEY || 'dummy_key',
   baseURL: 'https://api.featherless.ai/v1',
 });
 

@@ -21,16 +21,19 @@ export const analyzeSpending = async (req, res) => {
 // @route   POST /api/ai/chat
 export const chatWithAI = async (req, res) => {
   try {
-    const { query } = req.body;
+    const { query, message } = req.body;
+    const userQuery = query || message;
+    console.log('User query:', userQuery);
     
     // Fetch user data (mocking single user for MVP)
     const user = await User.findOne() || { monthlyIncome: 5000 };
     const expenses = await Expense.find().sort({ date: -1 }).limit(10);
 
-    const advice = await getFinancialAdvice(expenses, user.monthlyIncome, query);
+    const advice = await getFinancialAdvice(expenses, user.monthlyIncome, userQuery);
     
     res.status(200).json({ success: true, data: advice });
   } catch (error) {
+    console.error('Controller AI Error:', error);
     res.status(500).json({ success: false, error: 'AI Processing Error' });
   }
 };
