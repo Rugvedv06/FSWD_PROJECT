@@ -1,9 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { getBudgets, setBudget, getExpenses } from '../services/api';
 import { getCategoryColor } from '../utils/categoryColors';
+import formatCurrency from '../utils/formatCurrency';
+import { useAuth } from '../context/AuthContext';
+import Skeleton from './Skeleton';
+
+
 
 const Budget = ({ addToast }) => {
+  const { user } = useAuth();
+  const currency = user?.currency || 'INR';
   const [budgets, setBudgets] = useState({});
+
   const [expenses, setExpenses] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -57,7 +65,12 @@ const Budget = ({ addToast }) => {
       .reduce((sum, e) => sum + e.amount, 0);
   };
 
-  if (loading) return null;
+  if (loading) return (
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <Skeleton className="h-48" count={6} />
+    </div>
+  );
+
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
@@ -82,8 +95,9 @@ const Budget = ({ addToast }) => {
                 <h4 className="font-bold text-[var(--text)]">{category}</h4>
                 <div className="text-right">
                   <p className="text-[10px] uppercase font-bold tracking-wider" style={{ color: 'var(--muted)' }}>Spent</p>
-                  <p className="font-bold text-sm" style={{ color: 'var(--text)' }}>₹{spend.toFixed(2)}</p>
+                  <p className="font-bold text-sm" style={{ color: 'var(--text)' }}>{formatCurrency(spend, currency)}</p>
                 </div>
+
               </div>
 
               <div className="space-y-3">
@@ -110,8 +124,9 @@ const Budget = ({ addToast }) => {
                 <div className="space-y-1.5">
                   <div className="flex justify-between text-[11px] font-bold">
                     <span style={{ color: 'var(--muted)' }}>{percent.toFixed(0)}% Utilized</span>
-                    <span style={{ color: statusColor }}>{limit > 0 ? `₹${(limit - spend).toFixed(2)} left` : 'No limit'}</span>
+                    <span style={{ color: statusColor }}>{limit > 0 ? `${formatCurrency(limit - spend, currency)} left` : 'No limit'}</span>
                   </div>
+
                   <div className="h-1.5 w-full bg-[var(--surface-2)] rounded-full overflow-hidden">
                     <div 
                       className="h-full transition-all duration-500" 

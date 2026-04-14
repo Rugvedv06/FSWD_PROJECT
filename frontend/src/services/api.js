@@ -36,6 +36,12 @@ export const healthCheck = () => api.get('/health');
 // User Services
 export const getProfile = () => api.get('/users/profile');
 export const updateIncome = (income) => api.patch('/users/income', { monthlyIncome: income });
+export const updateProfile = (data) => api.patch('/users/profile', data);
+export const changePassword = (data) => api.patch('/users/password', data);
+
+// Auth Services
+export const login = (data) => api.post('/auth/login', data);
+export const register = (data) => api.post('/auth/register', data);
 
 // Expense Services
 export const getExpenses = () => api.get('/expenses');
@@ -52,5 +58,6 @@ export const deleteBudget = (id) => api.delete(`/budgets/${id}`);
 export const askAI = (query) => api.post('/ai/chat', { query });
 export const getAIAnalysis = () => api.get('/ai/analysis');
 export const getAIPrediction = () => api.get('/ai/predict');
+export const checkAffordability = (data) => api.post('/ai/afford', data);
 
 export default api;

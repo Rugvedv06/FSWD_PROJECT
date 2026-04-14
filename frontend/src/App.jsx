@@ -93,7 +93,7 @@ function App() {
           {activeTab === 'expenses' && <ExpenseManager addToast={addToast} />}
           {activeTab === 'budget' && <Budget addToast={addToast} />}
           {activeTab === 'ai-assistant' && <AIAssistant />}
-          {activeTab === 'settings' && <Settings theme={theme} setTheme={setTheme} />}
+          {activeTab === 'settings' && <Settings theme={theme} setTheme={setTheme} addToast={addToast} />}
         </section>
       </main>
 
