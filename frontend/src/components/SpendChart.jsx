@@ -51,7 +51,7 @@ const SpendChart = ({ expenses }) => {
               return data.labels.map((label, i) => {
                 const value = data.datasets[0].data[i];
                 return {
-                  text: `${label}: $${value.toFixed(2)}`,
+                  text: `${label}: ₹${value.toFixed(2)}`,
                   fillStyle: data.datasets[0].backgroundColor[i],
                   strokeStyle: 'transparent',
                   lineWidth: 0,
@@ -90,7 +90,7 @@ const SpendChart = ({ expenses }) => {
       <div className="absolute top-[42%] left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none text-center">
         <p className="text-[10px] font-bold uppercase tracking-widest" style={{ color: 'var(--muted)' }}>Total Outflow</p>
         <p className="text-2xl font-bold tracking-tight" style={{ color: 'var(--text)' }}>
-          ${values.reduce((a, b) => a + b, 0).toFixed(2)}
+          ₹{values.reduce((a, b) => a + b, 0).toFixed(2)}
         </p>
       </div>
     </div>

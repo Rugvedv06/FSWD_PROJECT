@@ -6,8 +6,8 @@ import User from '../models/User.js';
 // @route   GET /api/ai/analysis
 export const analyzeSpending = async (req, res) => {
   try {
-    const user = await User.findOne() || { monthlyIncome: 5000 };
-    const expenses = await Expense.find();
+    const user = await User.findById(req.userId) || { monthlyIncome: 5000 };
+    const expenses = await Expense.find({ userId: req.userId });
 
     const analysis = await getSpendingAnalysis(expenses, user.monthlyIncome);
     
@@ -23,11 +23,10 @@ export const chatWithAI = async (req, res) => {
   try {
     const { query, message } = req.body;
     const userQuery = query || message;
-    console.log('User query:', userQuery);
     
-    // Fetch user data (mocking single user for MVP)
-    const user = await User.findOne() || { monthlyIncome: 5000 };
-    const expenses = await Expense.find().sort({ date: -1 }).limit(10);
+    // Fetch user data
+    const user = await User.findById(req.userId) || { monthlyIncome: 5000 };
+    const expenses = await Expense.find({ userId: req.userId }).sort({ date: -1 }).limit(10);
 
     const advice = await getFinancialAdvice(expenses, user.monthlyIncome, userQuery);
     
@@ -44,8 +43,8 @@ export const predictAffordability = async (req, res) => {
   try {
     const { amount, category } = req.body;
     
-    const user = await User.findOne() || { monthlyIncome: 5000 };
-    const expenses = await Expense.find();
+    const user = await User.findById(req.userId) || { monthlyIncome: 5000 };
+    const expenses = await Expense.find({ userId: req.userId });
 
     const analysis = await checkAffordability(amount, category, expenses, user.monthlyIncome);
     

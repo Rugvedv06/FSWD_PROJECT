@@ -1,7 +1,9 @@
 import React from 'react';
-import { LayoutDashboard, Receipt, Wallet, Cpu, Settings, X, Circle } from 'lucide-react';
+import { LayoutDashboard, Receipt, Wallet, Cpu, Settings, X, Circle, LogOut } from 'lucide-react';
 
-const Sidebar = ({ activeTab, setActiveTab, isOpen, onClose }) => {
+const Sidebar = ({ activeTab, setActiveTab, isOpen, onClose, logout, user }) => {
+  const initials = user?.name ? user.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) : 'U';
+
   const tabs = [
     { id: 'dashboard', label: 'Dashboard', Icon: LayoutDashboard },
     { id: 'expenses', label: 'Expenses', Icon: Receipt },
@@ -67,20 +69,27 @@ const Sidebar = ({ activeTab, setActiveTab, isOpen, onClose }) => {
         </nav>
 
         {/* Bottom Section */}
-        <div className="p-4 border-t border-[var(--border)]">
+        <div className="p-4 border-t border-[var(--border)] space-y-4">
           <div className="flex items-center gap-3 px-2 py-3 rounded-lg bg-[var(--surface-2)]">
-            <div className="w-8 h-8 rounded-full bg-[var(--accent)] flex items-center justify-center text-[var(--bg)] font-bold text-sm">
-              U
+            <div className="w-8 h-8 rounded-full bg-[var(--accent)] flex items-center justify-center text-[var(--bg)] font-bold text-sm shrink-0 uppercase">
+              {initials}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-semibold text-[var(--text)] truncate">Account</p>
+              <p className="text-sm font-semibold text-[var(--text)] truncate">{user?.name || 'Account'}</p>
               <div className="flex items-center gap-1.5">
                 <Circle className="w-1.5 h-1.5 fill-[var(--success)] text-[var(--success)]" />
                 <span className="text-[11px] text-[var(--muted)] font-medium">Connected</span>
               </div>
             </div>
           </div>
-          <p className="mt-3 px-2 text-[10px] text-[var(--muted)] font-semibold uppercase tracking-wider">Pro Plan</p>
+          
+          <button 
+            onClick={logout}
+            className="w-full flex items-center gap-3 px-3 py-2 rounded-md text-xs font-bold uppercase tracking-wider text-[var(--danger)] hover:bg-[var(--danger)]/10 transition-all"
+          >
+            <LogOut className="w-4 h-4" />
+            Sign Out
+          </button>
         </div>
       </div>
     </>

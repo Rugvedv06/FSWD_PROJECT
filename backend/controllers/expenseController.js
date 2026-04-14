@@ -1,10 +1,10 @@
 import Expense from '../models/Expense.js';
 
-// @desc    Get all expenses
+// @desc    Get all expenses for logged in user
 // @route   GET /api/expenses
 export const getExpenses = async (req, res) => {
   try {
-    const expenses = await Expense.find().sort({ date: -1 });
+    const expenses = await Expense.find({ userId: req.userId }).sort({ date: -1 });
     res.status(200).json({ success: true, count: expenses.length, data: expenses });
   } catch (error) {
     console.error('getExpenses Error:', error);
@@ -26,7 +26,8 @@ export const addExpense = async (req, res) => {
       amount,
       category,
       date: date || Date.now(),
-      note
+      note,
+      userId: req.userId
     });
 
     res.status(201).json({ success: true, data: expense });
@@ -44,10 +45,10 @@ export const addExpense = async (req, res) => {
 // @route   DELETE /api/expenses/:id
 export const deleteExpense = async (req, res) => {
   try {
-    const expense = await Expense.findById(req.params.id);
+    const expense = await Expense.findOne({ _id: req.params.id, userId: req.userId });
 
     if (!expense) {
-      return res.status(404).json({ success: false, error: 'No expense found' });
+      return res.status(404).json({ success: false, error: 'No expense found or not authorized' });
     }
 
     await expense.deleteOne();
@@ -63,14 +64,14 @@ export const deleteExpense = async (req, res) => {
 export const updateExpense = async (req, res) => {
   try {
     const { amount, category, date, note } = req.body;
-    const expense = await Expense.findByIdAndUpdate(
-      req.params.id,
+    const expense = await Expense.findOneAndUpdate(
+      { _id: req.params.id, userId: req.userId },
       { amount, category, date, note },
       { new: true, runValidators: true }
     );
 
     if (!expense) {
-      return res.status(404).json({ success: false, error: 'No expense found' });
+      return res.status(404).json({ success: false, error: 'No expense found or not authorized' });
     }
 
     res.status(200).json({ success: true, data: expense });

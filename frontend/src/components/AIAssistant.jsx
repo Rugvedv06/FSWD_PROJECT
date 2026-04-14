@@ -4,7 +4,7 @@ import { Send, Bot, User } from 'lucide-react';
 
 const AIAssistant = () => {
   const [messages, setMessages] = useState([
-    { role: 'assistant', content: "Hello! I'm your LifeOS Financial Co-Pilot. I have direct access to your spending records. Ask me things like 'What's my biggest expense this month?' or 'Can I afford a $200 dinner?'" }
+    { role: 'assistant', content: "Hello! I'm your LifeOS Financial Co-Pilot. I have direct access to your spending records. Ask me things like 'What's my biggest expense this month?' or 'Can I afford a ₹2000 dinner?'" }
   ]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);

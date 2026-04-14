@@ -1,10 +1,23 @@
 import mongoose from 'mongoose';
+import bcrypt from 'bcryptjs';
 
 const userSchema = new mongoose.Schema({
   name: {
     type: String,
     required: [true, 'Please add a name'],
-    default: 'User',
+  },
+  email: {
+    type: String,
+    required: [true, 'Please add an email'],
+    unique: true,
+    lowercase: true,
+    trim: true,
+  },
+  password: {
+    type: String,
+    required: [true, 'Please add a password'],
+    minlength: 8,
+    select: false, // Don't return password by default
   },
   monthlyIncome: {
     type: Number,
@@ -18,6 +31,17 @@ const userSchema = new mongoose.Schema({
 }, {
   timestamps: true,
 });
+
+// Hash password before saving
+userSchema.pre('save', async function () {
+  if (!this.isModified('password')) return;
+  this.password = await bcrypt.hash(this.password, 12);
+});
+
+// Compare password
+userSchema.methods.comparePassword = async function (candidate) {
+  return await bcrypt.compare(candidate, this.password);
+};
 
 const User = mongoose.model('User', userSchema);
 
