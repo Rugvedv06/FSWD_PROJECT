@@ -134,7 +134,7 @@ const ExpenseManager = ({ addToast }) => {
             <div>
               <label className="block text-[10px] font-bold uppercase tracking-wider mb-2" style={{ color: 'var(--muted)' }}>Amount</label>
               <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 font-bold" style={{ color: 'var(--muted)' }}>$</span>
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 font-bold" style={{ color: 'var(--muted)' }}>₹</span>
                 <input
                   type="number"
                   step="0.01"
@@ -264,7 +264,7 @@ const ExpenseManager = ({ addToast }) => {
                   </td>
                   <td className="px-4 py-4">
                     <span className="text-sm font-bold tracking-tight text-[var(--text)]">
-                      ${parseFloat(expense.amount).toFixed(2)}
+                      ₹{parseFloat(expense.amount).toFixed(2)}
                     </span>
                   </td>
                   <td className="px-4 py-4 text-right">

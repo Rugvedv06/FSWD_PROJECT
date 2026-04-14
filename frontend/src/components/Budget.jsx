@@ -82,14 +82,14 @@ const Budget = ({ addToast }) => {
                 <h4 className="font-bold text-[var(--text)]">{category}</h4>
                 <div className="text-right">
                   <p className="text-[10px] uppercase font-bold tracking-wider" style={{ color: 'var(--muted)' }}>Spent</p>
-                  <p className="font-bold text-sm" style={{ color: 'var(--text)' }}>${spend.toFixed(2)}</p>
+                  <p className="font-bold text-sm" style={{ color: 'var(--text)' }}>₹{spend.toFixed(2)}</p>
                 </div>
               </div>
 
               <div className="space-y-3">
                 <div className="flex items-center gap-3">
                   <div className="relative flex-1">
-                    <span className="absolute left-2 top-1/2 -translate-y-1/2 text-xs font-bold" style={{ color: 'var(--muted)' }}>$</span>
+                    <span className="absolute left-2 top-1/2 -translate-y-1/2 text-xs font-bold" style={{ color: 'var(--muted)' }}>₹</span>
                     <input
                       type="number"
                       min="0"
@@ -110,7 +110,7 @@ const Budget = ({ addToast }) => {
                 <div className="space-y-1.5">
                   <div className="flex justify-between text-[11px] font-bold">
                     <span style={{ color: 'var(--muted)' }}>{percent.toFixed(0)}% Utilized</span>
-                    <span style={{ color: statusColor }}>{limit > 0 ? `$${(limit - spend).toFixed(2)} left` : 'No limit'}</span>
+                    <span style={{ color: statusColor }}>{limit > 0 ? `₹${(limit - spend).toFixed(2)} left` : 'No limit'}</span>
                   </div>
                   <div className="h-1.5 w-full bg-[var(--surface-2)] rounded-full overflow-hidden">
                     <div 

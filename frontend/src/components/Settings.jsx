@@ -45,10 +45,10 @@ const Settings = ({ theme, setTheme }) => {
         <div className="space-y-4">
           <div>
             <label className="block text-xs font-bold uppercase tracking-wider mb-2" style={{ color: 'var(--muted)' }}>
-              Monthly Income (USD)
+              Monthly Income (INR)
             </label>
             <div className="relative">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 font-bold" style={{ color: 'var(--muted)' }}>$</span>
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 font-bold" style={{ color: 'var(--muted)' }}>₹</span>
               <input
                 type="number"
                 min="0"

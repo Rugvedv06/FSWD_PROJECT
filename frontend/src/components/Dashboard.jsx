@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { TrendingUp, DollarSign, Brain, Shield, ArrowUpRight, ArrowDownRight } from 'lucide-react';
+import { TrendingUp, IndianRupee, Brain, Shield, ArrowUpRight, ArrowDownRight } from 'lucide-react';
 import { getAIAnalysis, getExpenses } from '../services/api';
 import SpendChart from './SpendChart';
 import { getCategoryColor } from '../utils/categoryColors';
@@ -63,9 +63,10 @@ const Dashboard = ({ setActiveTab }) => {
   const kpiCards = [
     {
       title: 'Current Spending',
-      value: `$${thisMonthTotal.toFixed(2)}`,
+      value: `₹${thisMonthTotal.toFixed(2)}`,
       context: 'Monthly Outflow',
-      icon: DollarSign,
+      icon: IndianRupee,
+
       color: 'var(--accent)'
     },
     {
@@ -77,7 +78,7 @@ const Dashboard = ({ setActiveTab }) => {
     },
     {
       title: 'Monthly Forecast',
-      value: `$${analysis?.prediction || '0.00'}`,
+      value: `₹${analysis?.prediction || '0.00'}`,
       context: 'Velocity Prediction',
       icon: TrendingUp,
       color: 'var(--accent)'
@@ -153,7 +154,7 @@ const Dashboard = ({ setActiveTab }) => {
                       <p className="text-[10px]" style={{ color: 'var(--muted)' }}>{new Date(exp.date).toLocaleDateString()}</p>
                     </div>
                   </div>
-                  <span className="text-xs font-bold" style={{ color: 'var(--text)' }}>${exp.amount.toFixed(2)}</span>
+                  <span className="text-xs font-bold" style={{ color: 'var(--text)' }}>₹${exp.amount.toFixed(2)}</span>
                 </div>
               ))}
               {expenses.length === 0 && (
