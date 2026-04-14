@@ -25,11 +25,13 @@ app.get('/api/health', (req, res) => {
 // Import Routes
 import expenseRoutes from './routes/expenseRoutes.js';
 import aiRoutes from './routes/aiRoutes.js';
-// import userRoutes from './routes/userRoutes.js';
+import budgetRoutes from './routes/budgetRoutes.js';
+import userRoutes from './routes/userRoutes.js';
 
 app.use('/api/expenses', expenseRoutes);
 app.use('/api/ai', aiRoutes);
-// app.use('/api/users', userRoutes);
+app.use('/api/budgets', budgetRoutes);
+app.use('/api/users', userRoutes);
 
 const startServer = async () => {
   await connectDB();

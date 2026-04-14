@@ -1,13 +1,19 @@
 import React, { useState, useEffect } from 'react';
-import { Moon, Sun } from 'lucide-react';
+import { Sun, Moon, Menu } from 'lucide-react';
 import Sidebar from './components/Sidebar';
 import ExpenseManager from './components/ExpenseManager';
 import AIAssistant from './components/AIAssistant';
 import Dashboard from './components/Dashboard';
+import Settings from './components/Settings';
+import Budget from './components/Budget';
+import ToastContainer from './components/ToastContainer';
+import { useToast } from './hooks/useToast';
 
 function App() {
   const [activeTab, setActiveTab] = useState('dashboard');
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [theme, setTheme] = useState(() => localStorage.getItem('theme') || 'dark');
+  const { toasts, addToast, removeToast } = useToast();
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
@@ -16,46 +22,73 @@ function App() {
 
   const toggleTheme = () => setTheme(t => t === 'dark' ? 'warm' : 'dark');
 
+  const getPageTitle = () => {
+    switch(activeTab) {
+      case 'dashboard': return 'Financial Overview';
+      case 'expenses': return 'Transactions';
+      case 'budget': return 'Budget Planning';
+      case 'ai-assistant': return 'AI Co-Pilot';
+      case 'settings': return 'System Settings';
+      default: return 'LifeOS Finance';
+    }
+  };
+
+  const getBreadcrumb = () => {
+    const date = new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+    if (activeTab === 'dashboard') return `Overview · ${date}`;
+    return `App · ${activeTab.charAt(0).toUpperCase() + activeTab.slice(1)}`;
+  };
+
   return (
-    <div className="flex h-screen">
-      <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
+    <div className="flex h-screen bg-[var(--bg)] text-[var(--text)] transition-colors duration-300">
+      <Sidebar 
+        activeTab={activeTab} 
+        setActiveTab={setActiveTab} 
+        isOpen={sidebarOpen} 
+        onClose={() => setSidebarOpen(false)} 
+      />
 
-      <main className="flex-1 overflow-y-auto relative">
-        <header className="px-6 py-4 border-b rounded-b-md sticky top-0 z-20 bg-transparent backdrop-blur-sm flex items-center justify-between">
-          <h2 className="text-2xl font-bold capitalize">{activeTab.replace('-', ' ')}</h2>
-
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() => setActiveTab('expenses')}
-              className="btn-primary focus-accent hidden md:inline-flex items-center gap-2"
+      <main className="flex-1 overflow-y-auto flex flex-col">
+        <header className="h-20 px-4 md:px-8 border-b border-[var(--border)] bg-[var(--surface)] flex items-center justify-between sticky top-0 z-20">
+          <div className="flex items-center gap-4">
+            <button 
+              onClick={() => setSidebarOpen(true)}
+              className="md:hidden p-2 hover:bg-[var(--surface-2)] rounded-md"
             >
-              New Entry
+              <Menu className="w-6 h-6" />
             </button>
+            
+            <div>
+              <h2 className="text-xl font-bold tracking-tight">{getPageTitle()}</h2>
+              <p className="text-[11px] font-medium text-[var(--muted)] uppercase tracking-wider">{getBreadcrumb()}</p>
+            </div>
+          </div>
 
+          <div className="flex items-center gap-4">
             <button
               onClick={toggleTheme}
+              className="p-2.5 rounded-full bg-[var(--surface-2)] border border-[var(--border)] hover:border-[var(--muted)] transition-all"
               aria-label="Toggle theme"
-              className="btn-neu flex items-center gap-2"
             >
-              <div className="w-8 h-8 rounded-md flex items-center justify-center" style={{ color: 'var(--accent)', background: 'transparent' }}>
-                {theme === 'dark' ? <Moon className="w-5 h-5" /> : <Sun className="w-5 h-5" />}
-              </div>
+              {theme === 'dark' ? (
+                <Sun className="w-5 h-5 text-[var(--accent)]" />
+              ) : (
+                <Moon className="w-5 h-5 text-[var(--muted)]" />
+              )}
             </button>
           </div>
         </header>
 
-        <section className="p-8 max-w-7xl mx-auto">
-          {activeTab === 'dashboard' && <Dashboard />}
-          {activeTab === 'expenses' && <ExpenseManager />}
+        <section className="flex-1 p-4 md:p-8 max-w-7xl w-full mx-auto">
+          {activeTab === 'dashboard' && <Dashboard setActiveTab={setActiveTab} />}
+          {activeTab === 'expenses' && <ExpenseManager addToast={addToast} />}
+          {activeTab === 'budget' && <Budget addToast={addToast} />}
           {activeTab === 'ai-assistant' && <AIAssistant />}
-
-          {activeTab !== 'dashboard' && activeTab !== 'expenses' && activeTab !== 'ai-assistant' && (
-            <div className="flex flex-col items-center justify-center py-20 text-muted">
-              <p className="text-lg font-bold tracking-widest uppercase italic">{activeTab.replace('-', ' ')} module under construction</p>
-            </div>
-          )}
+          {activeTab === 'settings' && <Settings theme={theme} setTheme={setTheme} />}
         </section>
       </main>
+
+      <ToastContainer toasts={toasts} removeToast={removeToast} />
     </div>
   );
 }

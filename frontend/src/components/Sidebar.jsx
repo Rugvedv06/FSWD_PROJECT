@@ -1,54 +1,89 @@
 import React from 'react';
-import { Layers, BarChart2, PieChart, Wallet, Cpu, User } from 'lucide-react';
+import { LayoutDashboard, Receipt, Wallet, Cpu, Settings, X, Circle } from 'lucide-react';
 
-const Sidebar = ({ activeTab, setActiveTab }) => {
+const Sidebar = ({ activeTab, setActiveTab, isOpen, onClose }) => {
   const tabs = [
-    { id: 'dashboard', label: 'Dashboard', Icon: BarChart2 },
-    { id: 'expenses', label: 'Expenses', Icon: PieChart },
+    { id: 'dashboard', label: 'Dashboard', Icon: LayoutDashboard },
+    { id: 'expenses', label: 'Expenses', Icon: Receipt },
     { id: 'budget', label: 'Budget', Icon: Wallet },
     { id: 'ai-assistant', label: 'AI Assistant', Icon: Cpu },
+    { id: 'settings', label: 'Settings', Icon: Settings },
   ];
 
+  const sidebarClasses = `
+    fixed inset-y-0 left-0 z-50 w-[240px] bg-[var(--surface)] border-r border-[var(--border)] 
+    transform transition-transform duration-300 ease-in-out flex flex-col
+    ${isOpen ? 'translate-x-0' : '-translate-x-full'}
+    md:translate-x-0 md:static md:h-screen
+  `;
+
   return (
-    <div className="w-64 h-screen p-6 flex flex-col neumorph">
-      <div className="flex items-center gap-3 mb-8">
-        <div className="w-10 h-10 rounded-lg flex items-center justify-center font-bold accent-bg">
-          <Layers className="w-6 h-6" />
-        </div>
-        <h1 className="text-lg font-bold" style={{ color: 'var(--text)' }}>
-          LifeOS Finance
-        </h1>
-      </div>
+    <>
+      {/* Mobile Overlay */}
+      {isOpen && (
+        <div 
+          className="fixed inset-0 bg-black/50 z-40 md:hidden" 
+          onClick={onClose}
+        />
+      )}
 
-      <nav className="flex-1 space-y-3">
-        {tabs.map((tab) => {
-          const ActiveIconColor = activeTab === tab.id ? 'var(--bg)' : 'var(--muted)';
-          return (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all text-sm font-medium`}
-              style={{ background: activeTab === tab.id ? 'var(--accent)' : 'transparent', color: activeTab === tab.id ? 'var(--bg)' : 'var(--muted)' }}
-            >
-              <tab.Icon className="w-5 h-5" style={{ color: ActiveIconColor }} />
-              <span>{tab.label}</span>
-            </button>
-          );
-        })}
-      </nav>
+      <div className={sidebarClasses}>
+        {/* Logo Area */}
+        <div className="p-6 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-md bg-[var(--accent)] flex items-center justify-center">
+              <div className="w-4 h-4 bg-[var(--bg)] rounded-sm" />
+            </div>
+            <span className="font-bold text-lg tracking-tight text-[var(--text)]">LifeOS Finance</span>
+          </div>
+          <button onClick={onClose} className="md:hidden text-[var(--muted)] hover:text-[var(--text)]">
+            <X className="w-5 h-5" />
+          </button>
+        </div>
 
-      <div className="mt-auto pt-6 border-t" style={{ borderColor: 'rgba(255,255,255,0.04)' }}>
-        <div className="flex items-center gap-3 p-2">
-          <div className="w-10 h-10 rounded-full neumorph-inset flex items-center justify-center">
-            <User className="w-5 h-5" style={{ color: 'var(--muted)' }} />
+        {/* Navigation */}
+        <nav className="flex-1 px-3 space-y-1">
+          {tabs.map((tab) => {
+            const isActive = activeTab === tab.id;
+            return (
+              <button
+                key={tab.id}
+                onClick={() => {
+                  setActiveTab(tab.id);
+                  onClose();
+                }}
+                className={`
+                  w-full flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium transition-all
+                  ${isActive 
+                    ? 'bg-[var(--accent)] text-[var(--bg)]' 
+                    : 'text-[var(--muted)] hover:bg-[var(--surface-2)] hover:text-[var(--text)]'}
+                `}
+              >
+                <tab.Icon className="w-5 h-5" />
+                <span>{tab.label}</span>
+              </button>
+            );
+          })}
+        </nav>
+
+        {/* Bottom Section */}
+        <div className="p-4 border-t border-[var(--border)]">
+          <div className="flex items-center gap-3 px-2 py-3 rounded-lg bg-[var(--surface-2)]">
+            <div className="w-8 h-8 rounded-full bg-[var(--accent)] flex items-center justify-center text-[var(--bg)] font-bold text-sm">
+              U
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-semibold text-[var(--text)] truncate">Account</p>
+              <div className="flex items-center gap-1.5">
+                <Circle className="w-1.5 h-1.5 fill-[var(--success)] text-[var(--success)]" />
+                <span className="text-[11px] text-[var(--muted)] font-medium">Connected</span>
+              </div>
+            </div>
           </div>
-          <div>
-            <p className="text-sm font-medium" style={{ color: 'var(--text)' }}>Account</p>
-            <p className="text-xs" style={{ color: 'var(--muted)' }}>Premium</p>
-          </div>
+          <p className="mt-3 px-2 text-[10px] text-[var(--muted)] font-semibold uppercase tracking-wider">Pro Plan</p>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 
