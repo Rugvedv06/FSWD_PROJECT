@@ -33,6 +33,10 @@ const Budget = ({ addToast }) => {
   }, []);
 
   const handleUpdateBudget = async (category, limit) => {
+    if (Number(limit) < 0) {
+      addToast(`Budget limit cannot be negative.`, 'error');
+      return;
+    }
     try {
       await setBudget({ category, limit: Number(limit) });
       addToast(`${category} budget updated.`, 'success');
@@ -88,6 +92,7 @@ const Budget = ({ addToast }) => {
                     <span className="absolute left-2 top-1/2 -translate-y-1/2 text-xs font-bold" style={{ color: 'var(--muted)' }}>$</span>
                     <input
                       type="number"
+                      min="0"
                       value={budgets[category] || ''}
                       onChange={(e) => setBudgets({...budgets, [category]: e.target.value})}
                       placeholder="Set limit"

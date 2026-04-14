@@ -66,6 +66,11 @@ const ExpenseManager = ({ addToast }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (Number(formData.amount) < 0) {
+      addToast('Amount cannot be negative.', 'error');
+      return;
+    }
+
     try {
       if (editingId) {
         await updateExpense(editingId, formData);
@@ -133,6 +138,7 @@ const ExpenseManager = ({ addToast }) => {
                 <input
                   type="number"
                   step="0.01"
+                  min="0"
                   required
                   className="w-full pl-7 pr-4 py-2"
                   value={formData.amount}

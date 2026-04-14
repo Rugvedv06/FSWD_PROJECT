@@ -54,6 +54,7 @@ function App() {
         isOpen={sidebarOpen} 
         onClose={() => setSidebarOpen(false)}
         logout={logout}
+        user={user}
       />
 
       <main className="flex-1 overflow-y-auto flex flex-col">

@@ -21,6 +21,10 @@ const Settings = ({ theme, setTheme }) => {
   }, []);
 
   const handleSaveIncome = async () => {
+    if (Number(income) < 0) {
+       setStatus({ message: 'Income cannot be negative.', type: 'error' });
+       return;
+    }
     try {
       await updateIncome(Number(income));
       setStatus({ message: 'Income profile updated successfully.', type: 'success' });
@@ -47,6 +51,7 @@ const Settings = ({ theme, setTheme }) => {
               <span className="absolute left-3 top-1/2 -translate-y-1/2 font-bold" style={{ color: 'var(--muted)' }}>$</span>
               <input
                 type="number"
+                min="0"
                 value={income}
                 onChange={(e) => setIncome(e.target.value)}
                 className="w-full pl-7 pr-4 py-2"
