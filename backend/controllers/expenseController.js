@@ -57,3 +57,24 @@ export const deleteExpense = async (req, res) => {
     res.status(500).json({ success: false, error: 'Server Error' });
   }
 };
+
+// @desc    Update expense
+// @route   PATCH /api/expenses/:id
+export const updateExpense = async (req, res) => {
+  try {
+    const { amount, category, date, note } = req.body;
+    const expense = await Expense.findByIdAndUpdate(
+      req.params.id,
+      { amount, category, date, note },
+      { new: true, runValidators: true }
+    );
+
+    if (!expense) {
+      return res.status(404).json({ success: false, error: 'No expense found' });
+    }
+
+    res.status(200).json({ success: true, data: expense });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+};

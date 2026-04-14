@@ -1,10 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { askAI } from '../services/api';
-import { Send } from 'lucide-react';
+import { Send, Bot, User } from 'lucide-react';
 
 const AIAssistant = () => {
   const [messages, setMessages] = useState([
-    { role: 'assistant', content: "Hello! I'm your LifeOS Financial Intelligence. Ask me anything about your spending or say 'Can I afford a $100 watch?'" }
+    { role: 'assistant', content: "Hello! I'm your LifeOS Financial Co-Pilot. I have direct access to your spending records. Ask me things like 'What's my biggest expense this month?' or 'Can I afford a $200 dinner?'" }
   ]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
@@ -32,36 +32,41 @@ const AIAssistant = () => {
       const aiMessage = { role: 'assistant', content: response.data.data };
       setMessages(prev => [...prev, aiMessage]);
     } catch (error) {
-      setMessages(prev => [...prev, { role: 'assistant', content: "System connection error. Please verify your AI uplink." }]);
+      setMessages(prev => [...prev, { role: 'assistant', content: "I'm having trouble connecting to the neural engine. Please check your network." }]);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="flex flex-col h-[calc(100vh-200px)] bg-slate-900/50 backdrop-blur-xl border border-slate-800 rounded-3xl overflow-hidden shadow-2xl relative">
-      <div className="absolute inset-0 bg-grid-white/[0.02] pointer-events-none" />
-      
+    <div className="flex flex-col h-[calc(100vh-180px)] bg-[var(--surface)] border border-[var(--border)] rounded-[var(--radius-lg)] overflow-hidden shadow-[var(--shadow-md)]">
       {/* Messages Area */}
-      <div className="flex-1 overflow-y-auto p-6 space-y-6">
+      <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-6">
         {messages.map((msg, i) => (
           <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-            <div className={`max-w-[80%] px-6 py-4 rounded-2xl ${
-              msg.role === 'user' 
-                ? 'accent-bg rounded-tr-none' 
-                : 'bg-slate-800 border border-slate-700 text-slate-200 rounded-tl-none'
-            } shadow-lg transition-all animate-in slide-in-from-bottom-2`}>
-              <p className="text-sm leading-relaxed">{msg.content}</p>
+            <div className={`flex gap-3 max-w-[85%] ${msg.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}>
+               <div className={`w-8 h-8 rounded-full flex-shrink-0 flex items-center justify-center border border-[var(--border)] ${msg.role === 'user' ? 'bg-[var(--accent)] text-[var(--bg)]' : 'bg-[var(--surface-2)] text-[var(--muted)]'}`}>
+                  {msg.role === 'user' ? <User className="w-4 h-4" /> : <Bot className="w-4 h-4" />}
+               </div>
+               <div 
+                className={`px-5 py-3 rounded-2xl text-sm leading-relaxed shadow-sm ${
+                  msg.role === 'user' 
+                    ? 'bg-[var(--accent)] text-[var(--bg)] rounded-tr-none font-medium' 
+                    : 'bg-[var(--surface-2)] border border-[var(--border)] text-[var(--text)] rounded-tl-none'
+                }`}
+              >
+                {msg.content}
+              </div>
             </div>
           </div>
         ))}
         {loading && (
           <div className="flex justify-start">
-            <div className="bg-slate-800 border border-slate-700 p-4 rounded-2xl rounded-tl-none animate-pulse">
-              <div className="flex gap-2">
-                <div className="w-2 h-2 rounded-full animate-bounce" style={{ background: 'var(--accent)' }}></div>
-                <div className="w-2 h-2 rounded-full animate-bounce" style={{ background: 'var(--accent)', animationDelay: '0.2s' }}></div>
-                <div className="w-2 h-2 rounded-full animate-bounce" style={{ background: 'var(--accent)', animationDelay: '0.4s' }}></div>
+            <div className="flex gap-3 items-center bg-[var(--surface-2)] border border-[var(--border)] p-4 rounded-2xl rounded-tl-none">
+              <div className="flex gap-1.5">
+                <div className="w-1.5 h-1.5 rounded-full animate-bounce bg-[var(--accent)]"></div>
+                <div className="w-1.5 h-1.5 rounded-full animate-bounce bg-[var(--accent)]" style={{ animationDelay: '0.2s' }}></div>
+                <div className="w-1.5 h-1.5 rounded-full animate-bounce bg-[var(--accent)]" style={{ animationDelay: '0.4s' }}></div>
               </div>
             </div>
           </div>
@@ -70,28 +75,25 @@ const AIAssistant = () => {
       </div>
 
       {/* Input Area */}
-      <form onSubmit={handleSend} className="p-6 bg-slate-900/80 border-t border-slate-800 backdrop-blur-md">
-        <div className="relative flex items-center">
+      <div className="p-4 md:p-6 border-t border-[var(--border)] bg-[var(--surface)]">
+        <form onSubmit={handleSend} className="relative flex items-center group">
           <input
             type="text"
-            className="w-full bg-slate-800 border border-slate-700 rounded-2xl px-6 py-4 pr-16 focus-accent transition-all text-slate-100 placeholder-slate-500 shadow-inner"
-            placeholder="Ask your AI assistant..."
+            className="w-full bg-[var(--surface-2)] border border-[var(--border)] rounded-full px-6 py-3.5 pr-16 focus:border-[var(--accent)] focus:ring-2 focus:ring-[var(--accent-ring)] transition-all outline-none text-sm font-medium"
+            placeholder="Search financial records or ask for advice..."
             value={input}
             onChange={(e) => setInput(e.target.value)}
             disabled={loading}
           />
           <button
             type="submit"
-            disabled={loading}
-            className="absolute right-3 p-2 btn-primary transition-all active:scale-95 shadow-lg disabled:opacity-50"
+            disabled={loading || !input.trim()}
+            className="absolute right-2 p-2.5 bg-[var(--accent)] text-[var(--bg)] rounded-full transition-all hover:scale-105 active:scale-95 disabled:opacity-50 disabled:hover:scale-100"
           >
-            {loading ? '...' : <Send className="w-5 h-5" />}
+            <Send className="w-4 h-4" />
           </button>
-        </div>
-        <p className="text-[10px] text-slate-600 mt-3 text-center uppercase tracking-widest font-bold">
-          Powered by LifeOS Financial Neural Engine v1.0
-        </p>
-      </form>
+        </form>
+      </div>
     </div>
   );
 };

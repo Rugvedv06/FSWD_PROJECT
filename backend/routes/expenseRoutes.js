@@ -1,5 +1,5 @@
 import express from 'express';
-import { getExpenses, addExpense, deleteExpense } from '../controllers/expenseController.js';
+import { getExpenses, addExpense, deleteExpense, updateExpense } from '../controllers/expenseController.js';
 
 const router = express.Router();
 
@@ -8,6 +8,7 @@ router.route('/')
   .post(addExpense);
 
 router.route('/:id')
-  .delete(deleteExpense);
+  .delete(deleteExpense)
+  .patch(updateExpense);
 
 export default router;

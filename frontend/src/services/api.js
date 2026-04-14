@@ -18,7 +18,13 @@ export const updateIncome = (income) => api.patch('/users/income', { monthlyInco
 // Expense Services
 export const getExpenses = () => api.get('/expenses');
 export const addExpense = (expenseData) => api.post('/expenses', expenseData);
+export const updateExpense = (id, expenseData) => api.patch(`/expenses/${id}`, expenseData);
 export const deleteExpense = (id) => api.delete(`/expenses/${id}`);
+
+// Budget Services
+export const getBudgets = () => api.get('/budgets');
+export const setBudget = (data) => api.post('/budgets', data);
+export const deleteBudget = (id) => api.delete(`/budgets/${id}`);
 
 // AI Services
 export const askAI = (query) => api.post('/ai/chat', { query });
