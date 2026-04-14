@@ -1,10 +1,17 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { askAI } from '../services/api';
 import { Send, Bot, User } from 'lucide-react';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+
+import { useAuth } from '../context/AuthContext';
+import formatCurrency from '../utils/formatCurrency';
 
 const AIAssistant = () => {
+  const { user } = useAuth();
+  const currency = user?.currency || 'INR';
   const [messages, setMessages] = useState([
-    { role: 'assistant', content: "Hello! I'm your LifeOS Financial Co-Pilot. I have direct access to your spending records. Ask me things like 'What's my biggest expense this month?' or 'Can I afford a ₹2000 dinner?'" }
+    { role: 'assistant', content: `Hello! I'm your LifeOS Financial Co-Pilot. I have direct access to your spending records. Ask me things like 'What's my biggest expense this month?' or 'Can I afford a ${formatCurrency(2000, currency)} dinner?'` }
   ]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
@@ -38,6 +45,19 @@ const AIAssistant = () => {
     }
   };
 
+  const MarkdownComponents = {
+    p: ({ children }) => <p className="mb-2 last:mb-0">{children}</p>,
+    strong: ({ children }) => <strong className="font-bold text-[var(--accent)]">{children}</strong>,
+    ul: ({ children }) => <ul className="list-disc ml-4 mb-2 space-y-1">{children}</ul>,
+    ol: ({ children }) => <ol className="list-decimal ml-4 mb-2 space-y-1">{children}</ol>,
+    li: ({ children }) => <li className="text-sm">{children}</li>,
+    h1: ({ children }) => <h1 className="text-lg font-bold mb-2 text-[var(--accent)]">{children}</h1>,
+    h2: ({ children }) => <h2 className="text-md font-bold mb-2 text-[var(--accent)]">{children}</h2>,
+    h3: ({ children }) => <h3 className="text-sm font-bold mb-1 text-[var(--accent)]">{children}</h3>,
+    blockquote: ({ children }) => <blockquote className="border-l-2 border-[var(--accent)] pl-3 italic my-2">{children}</blockquote>,
+    code: ({ children }) => <code className="bg-[var(--surface)] px-1.5 py-0.5 rounded text-xs font-mono">{children}</code>,
+  };
+
   return (
     <div className="flex flex-col h-[calc(100vh-180px)] bg-[var(--surface)] border border-[var(--border)] rounded-[var(--radius-lg)] overflow-hidden shadow-[var(--shadow-md)]">
       {/* Messages Area */}
@@ -52,10 +72,19 @@ const AIAssistant = () => {
                 className={`px-5 py-3 rounded-2xl text-sm leading-relaxed shadow-sm ${
                   msg.role === 'user' 
                     ? 'bg-[var(--accent)] text-[var(--bg)] rounded-tr-none font-medium' 
-                    : 'bg-[var(--surface-2)] border border-[var(--border)] text-[var(--text)] rounded-tl-none'
+                    : 'bg-[var(--surface-2)] border border-[var(--border)] text-[var(--text)] rounded-tl-none prose prose-invert max-w-none'
                 }`}
               >
-                {msg.content}
+                {msg.role === 'assistant' ? (
+                  <ReactMarkdown 
+                    remarkPlugins={[remarkGfm]}
+                    components={MarkdownComponents}
+                  >
+                    {msg.content}
+                  </ReactMarkdown>
+                ) : (
+                  msg.content
+                )}
               </div>
             </div>
           </div>

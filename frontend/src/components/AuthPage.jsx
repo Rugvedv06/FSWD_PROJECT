@@ -11,7 +11,9 @@ const AuthPage = () => {
     name: '',
     email: '',
     password: '',
-    confirmPassword: ''
+    confirmPassword: '',
+    monthlyIncome: ''
+
   });
 
   const { login } = useAuth();
@@ -30,7 +32,13 @@ const AuthPage = () => {
       const endpoint = isLogin ? '/auth/login' : '/auth/register';
       const payload = isLogin 
         ? { email: formData.email, password: formData.password }
-        : { name: formData.name, email: formData.email, password: formData.password };
+        : { 
+            name: formData.name, 
+            email: formData.email, 
+            password: formData.password,
+            monthlyIncome: Number(formData.monthlyIncome) || 0
+          };
+
       
       const res = await axios.post(`${API_URL}${endpoint}`, payload);
       login(res.data.token, res.data.user);
@@ -128,6 +136,25 @@ const AuthPage = () => {
                 </div>
               </div>
             )}
+
+            {!isLogin && (
+              <div className="space-y-2">
+                <label className="text-[10px] font-bold uppercase tracking-wider text-[var(--muted)]">Monthly Income (INR)</label>
+                <div className="relative">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 font-bold text-[var(--muted)]">₹</span>
+                  <input
+                    type="number"
+                    min="0"
+                    required
+                    className="w-full pl-10 pr-4 py-2.5"
+                    placeholder="e.g. 50000"
+                    value={formData.monthlyIncome}
+                    onChange={(e) => setFormData({ ...formData, monthlyIncome: e.target.value })}
+                  />
+                </div>
+              </div>
+            )}
+
 
             {error && (
               <p className="text-xs font-bold text-[var(--danger)] bg-[var(--danger)]/10 p-3 rounded-lg border border-[var(--danger)]/20">

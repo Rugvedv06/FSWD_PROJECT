@@ -23,10 +23,10 @@ const DEFAULT_MODEL = process.env.FEATHERLESS_MODEL || "meta-llama/Llama-3-8b-in
  */
 export const getFinancialAdvice = async (expenses, monthlyIncome, query) => {
   try {
-    const expenseSummary = expenses.map(e => `${e.category}: $${e.amount} (${e.note || 'no note'})`).join(', ');
+    const expenseSummary = expenses.map(e => `${e.category}: ₹${e.amount} (${e.note || 'no note'})`).join(', ');
     
     const systemPrompt = `You are LifeOS Finance AI, a world-class financial advisor. 
-    User's Monthly Income: $${monthlyIncome}. 
+    User's Monthly Income: ₹${monthlyIncome}. 
     Recent Expenses: ${expenseSummary || 'No expenses yet'}.
     Provide concise, data-driven, and slightly futuristic/professional advice. 
     Focus on behavioral patterns and actionable steps.`;
@@ -60,8 +60,8 @@ export const getSpendingAnalysis = async (expenses, monthlyIncome) => {
     }, {});
 
     const systemPrompt = `You are a financial data scientist. Analyze this spending data:
-    Income: $${monthlyIncome}
-    Total Spent: $${totalSpent}
+    Income: ₹${monthlyIncome}
+    Total Spent: ₹${totalSpent}
     Category Breakdown: ${JSON.stringify(categoryTotals)}
     
     Provide a JSON response with:
@@ -92,12 +92,12 @@ export const checkAffordability = async (amount, category, expenses, monthlyInco
     const totalSpent = expenses.reduce((sum, e) => sum + e.amount, 0);
     const remaining = monthlyIncome - totalSpent;
 
-    const systemPrompt = `Analyze if a user can afford a $${amount} purchase for ${category}.
+    const systemPrompt = `Analyze if a user can afford a ₹${amount} purchase for ${category}.
     Context:
-    Monthly Income: $${monthlyIncome}
-    Total Spent so far: $${totalSpent}
-    Remaining Budget: $${remaining}
-    Recent spending history: ${expenses.slice(0, 5).map(e => e.category + ': $' + e.amount).join(', ')}
+    Monthly Income: ₹${monthlyIncome}
+    Total Spent so far: ₹${totalSpent}
+    Remaining Budget: ₹${remaining}
+    Recent spending history: ${expenses.slice(0, 5).map(e => e.category + ': ₹' + e.amount).join(', ')}
     
     Give a 'YES', 'NO', or 'CAUTION' verdict followed by a 1-sentence explanation.`;
 

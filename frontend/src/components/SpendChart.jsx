@@ -2,10 +2,21 @@ import React, { useMemo } from 'react';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
 import { Doughnut } from 'react-chartjs-2';
 import { getCategoryColor } from '../utils/categoryColors';
+import formatCurrency from '../utils/formatCurrency';
+import { useAuth } from '../context/AuthContext';
+
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
 const SpendChart = ({ expenses }) => {
+  const { user } = useAuth();
+  const currency = user?.currency || 'INR';
+  const style = getComputedStyle(document.documentElement);
+
+  const surfaceColor = style.getPropertyValue('--surface-2').trim() || '#18181B';
+  const borderColor = style.getPropertyValue('--border').trim() || '#27272A';
+  const mutedColor = style.getPropertyValue('--muted').trim() || '#A1A1AA';
+
   const categoryData = useMemo(() => {
     return expenses.reduce((acc, exp) => {
       acc[exp.category] = (acc[exp.category] || 0) + Number(exp.amount);
@@ -36,7 +47,7 @@ const SpendChart = ({ expenses }) => {
       legend: {
         position: 'bottom',
         labels: {
-          color: '#A1A1AA', // Zinc-400 fallback
+          color: mutedColor,
           usePointStyle: true,
           pointStyle: 'circle',
           padding: 20,
@@ -51,7 +62,7 @@ const SpendChart = ({ expenses }) => {
               return data.labels.map((label, i) => {
                 const value = data.datasets[0].data[i];
                 return {
-                  text: `${label}: ₹${value.toFixed(2)}`,
+                  text: `${label}: ${formatCurrency(value, currency)}`,
                   fillStyle: data.datasets[0].backgroundColor[i],
                   strokeStyle: 'transparent',
                   lineWidth: 0,
@@ -65,14 +76,16 @@ const SpendChart = ({ expenses }) => {
         }
       },
       tooltip: {
-        backgroundColor: '#18181B',
+        backgroundColor: surfaceColor,
+
         titleFont: { size: 13, weight: 'bold' },
         bodyFont: { size: 12 },
         padding: 12,
         cornerRadius: 8,
         displayColors: true,
-        borderColor: '#27272A',
+        borderColor: borderColor,
         borderWidth: 1
+
       }
     },
     cutout: '75%',
@@ -90,8 +103,9 @@ const SpendChart = ({ expenses }) => {
       <div className="absolute top-[42%] left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none text-center">
         <p className="text-[10px] font-bold uppercase tracking-widest" style={{ color: 'var(--muted)' }}>Total Outflow</p>
         <p className="text-2xl font-bold tracking-tight" style={{ color: 'var(--text)' }}>
-          ₹{values.reduce((a, b) => a + b, 0).toFixed(2)}
+          {formatCurrency(values.reduce((a, b) => a + b, 0), currency)}
         </p>
+
       </div>
     </div>
   );

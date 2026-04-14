@@ -1,14 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import { Search, Filter, Download, Edit2, Trash2, ChevronLeft, ChevronRight, PlusCircle } from 'lucide-react';
-import { getExpenses, addExpense, deleteExpense, updateExpense } from '../services/api';
+import { getExpenses, addExpense, deleteExpense, updateExpense, checkAffordability } from '../services/api';
 import { getCategoryColor } from '../utils/categoryColors';
 import { exportToCSV } from '../utils/exportCSV';
+import formatCurrency from '../utils/formatCurrency';
+import { useAuth } from '../context/AuthContext';
+import ConfirmModal from './ConfirmModal';
+import Skeleton from './Skeleton';
 
 const ExpenseManager = ({ addToast }) => {
+  const { user } = useAuth();
+  const currency = user?.currency || 'INR';
   const [expenses, setExpenses] = useState([]);
   const [filteredExpenses, setFilteredExpenses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [editingId, setEditingId] = useState(null);
+  const [isDeleting, setIsDeleting] = useState(null);
   
   // States for search and filter
   const [searchTerm, setSearchTerm] = useState('');
@@ -48,18 +55,15 @@ const ExpenseManager = ({ addToast }) => {
 
   const applyFilters = () => {
     let result = [...expenses];
-    
     if (searchTerm) {
       result = result.filter(exp => 
         (exp.note && exp.note.toLowerCase().includes(searchTerm.toLowerCase())) ||
         exp.category.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
-    
     if (filterCategory !== 'All') {
       result = result.filter(exp => exp.category === filterCategory);
     }
-    
     setFilteredExpenses(result);
     setCurrentPage(1);
   };
@@ -76,6 +80,21 @@ const ExpenseManager = ({ addToast }) => {
         await updateExpense(editingId, formData);
         addToast('Expense updated successfully.', 'success');
       } else {
+        // AI Affordability check (optional micro-feature)
+        if (Number(formData.amount) > (user?.monthlyIncome || 0) * 0.1) {
+           try {
+             const res = await checkAffordability({ 
+               amount: Number(formData.amount), 
+               category: formData.category,
+               expenses,
+               monthlyIncome: user?.monthlyIncome || 0
+             });
+             if (res.data.data.includes('NO')) {
+                addToast('AI Warning: This expense may strain your budget.', 'info');
+             }
+           } catch(err) { /* ignore AI error for UX */ }
+        }
+
         await addExpense(formData);
         addToast('Expense logged successfully.', 'success');
       }
@@ -104,13 +123,16 @@ const ExpenseManager = ({ addToast }) => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const handleDelete = async (id) => {
+  const confirmDelete = async () => {
+    if (!isDeleting) return;
     try {
-      await deleteExpense(id);
+      await deleteExpense(isDeleting);
       addToast('Expense deleted.', 'info');
       fetchExpenses();
     } catch (error) {
       addToast('Failed to delete expense.', 'error');
+    } finally {
+      setIsDeleting(null);
     }
   };
 
@@ -120,8 +142,26 @@ const ExpenseManager = ({ addToast }) => {
   const currentRows = filteredExpenses.slice(indexOfFirstRow, indexOfLastRow);
   const totalPages = Math.ceil(filteredExpenses.length / rowsPerPage);
 
+  if (loading) return (
+    <div className="space-y-8">
+      <Skeleton className="h-64" />
+      <div className="card">
+        <Skeleton className="h-10 mb-4" />
+        <Skeleton className="h-12" count={5} />
+      </div>
+    </div>
+  );
+
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
+      <ConfirmModal 
+        isOpen={!!isDeleting}
+        title="Delete Transaction?"
+        message="This action cannot be undone. This record will be permanently removed from your financial history."
+        onConfirm={confirmDelete}
+        onCancel={() => setIsDeleting(null)}
+      />
+
       {/* Form Section */}
       <div className="card">
         <div className="flex items-center gap-2 mb-6 text-[var(--accent)] text-lg">
@@ -214,10 +254,10 @@ const ExpenseManager = ({ addToast }) => {
                   onChange={(e) => setSearchTerm(e.target.value)}
                 />
              </div>
-             <div className="relative">
+             <div className="relative border border-[var(--border)] rounded-lg">
                 <Filter className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: 'var(--muted)' }} />
                 <select 
-                  className="pl-10 h-10 text-sm"
+                  className="pl-10 h-10 text-sm bg-transparent border-none appearance-none pr-8 cursor-pointer"
                   value={filterCategory}
                   onChange={(e) => setFilterCategory(e.target.value)}
                 >
@@ -240,11 +280,11 @@ const ExpenseManager = ({ addToast }) => {
           <table className="w-full border-separate border-spacing-0">
             <thead>
               <tr className="text-[10px] font-bold uppercase tracking-wider text-[var(--muted)] border-b border-[var(--border)]">
-                <th className="px-4 py-4 text-left font-bold">When</th>
-                <th className="px-4 py-4 text-left font-bold">Description</th>
-                <th className="px-4 py-4 text-left font-bold">Category</th>
-                <th className="px-4 py-4 text-left font-bold">Amount</th>
-                <th className="px-4 py-4 text-right font-bold">Action</th>
+                <th className="px-4 py-4 text-left font-bold border-b border-[var(--border)]">When</th>
+                <th className="px-4 py-4 text-left font-bold border-b border-[var(--border)]">Description</th>
+                <th className="px-4 py-4 text-left font-bold border-b border-[var(--border)]">Category</th>
+                <th className="px-4 py-4 text-left font-bold border-b border-[var(--border)]">Amount</th>
+                <th className="px-4 py-4 text-right font-bold border-b border-[var(--border)]">Action</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-[var(--border)]">
@@ -264,20 +304,21 @@ const ExpenseManager = ({ addToast }) => {
                   </td>
                   <td className="px-4 py-4">
                     <span className="text-sm font-bold tracking-tight text-[var(--text)]">
-                      ₹{parseFloat(expense.amount).toFixed(2)}
+                      {formatCurrency(expense.amount, currency)}
                     </span>
                   </td>
+
                   <td className="px-4 py-4 text-right">
                     <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                       <button 
                         onClick={() => handleEdit(expense)}
-                        className="p-1.5 hover:text-(--accent) transition-colors"
+                        className="p-1.5 hover:text-[var(--accent)] transition-colors"
                       >
                         <Edit2 className="w-4 h-4" />
                       </button>
                       <button 
-                         onClick={() => handleDelete(expense._id)}
-                         className="p-1.5 hover:text-(--danger) transition-colors"
+                         onClick={() => setIsDeleting(expense._id)}
+                         className="p-1.5 hover:text-[var(--danger)] transition-colors"
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>
@@ -309,12 +350,12 @@ const ExpenseManager = ({ addToast }) => {
             >
               <ChevronLeft className="w-4 h-4" />
             </button>
-            <div className="flex gap-1">
+            <div className="flex gap-1 overflow-x-auto max-w-[150px] md:max-w-none">
               {[...Array(totalPages)].map((_, i) => (
                 <button
                   key={i}
                   onClick={() => setCurrentPage(i + 1)}
-                  className={`w-8 h-8 text-[11px] font-bold rounded-md transition-all ${currentPage === i + 1 ? 'bg-[var(--accent)] text-[var(--bg)]' : 'hover:bg-[var(--border)]'}`}
+                  className={`min-w-[32px] h-8 text-[11px] font-bold rounded-md transition-all ${currentPage === i + 1 ? 'bg-[var(--accent)] text-[var(--bg)]' : 'hover:bg-[var(--border)]'}`}
                 >
                   {i + 1}
                 </button>
