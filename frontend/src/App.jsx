@@ -6,14 +6,17 @@ import AIAssistant from './components/AIAssistant';
 import Dashboard from './components/Dashboard';
 import Settings from './components/Settings';
 import Budget from './components/Budget';
+import AuthPage from './components/AuthPage';
 import ToastContainer from './components/ToastContainer';
 import { useToast } from './hooks/useToast';
+import { useAuth } from './context/AuthContext';
 
 function App() {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [theme, setTheme] = useState(() => localStorage.getItem('theme') || 'dark');
   const { toasts, addToast, removeToast } = useToast();
+  const { isAuthenticated, logout, user } = useAuth();
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
@@ -21,6 +24,10 @@ function App() {
   }, [theme]);
 
   const toggleTheme = () => setTheme(t => t === 'dark' ? 'warm' : 'dark');
+
+  if (!isAuthenticated) {
+    return <AuthPage />;
+  }
 
   const getPageTitle = () => {
     switch(activeTab) {
@@ -45,7 +52,8 @@ function App() {
         activeTab={activeTab} 
         setActiveTab={setActiveTab} 
         isOpen={sidebarOpen} 
-        onClose={() => setSidebarOpen(false)} 
+        onClose={() => setSidebarOpen(false)}
+        logout={logout}
       />
 
       <main className="flex-1 overflow-y-auto flex flex-col">

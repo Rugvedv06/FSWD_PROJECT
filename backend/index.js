@@ -22,16 +22,24 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'success', message: 'LifeOS Finance API is running' });
 });
 
+// Import Middleware
+import { protect } from './middleware/protect.js';
+
 // Import Routes
+import authRoutes from './routes/authRoutes.js';
 import expenseRoutes from './routes/expenseRoutes.js';
 import aiRoutes from './routes/aiRoutes.js';
 import budgetRoutes from './routes/budgetRoutes.js';
 import userRoutes from './routes/userRoutes.js';
 
-app.use('/api/expenses', expenseRoutes);
-app.use('/api/ai', aiRoutes);
-app.use('/api/budgets', budgetRoutes);
-app.use('/api/users', userRoutes);
+// Setup Routes
+app.use('/api/auth', authRoutes); // Public
+
+// Protected Routes
+app.use('/api/expenses', protect, expenseRoutes);
+app.use('/api/ai', protect, aiRoutes);
+app.use('/api/budgets', protect, budgetRoutes);
+app.use('/api/users', protect, userRoutes);
 
 const startServer = async () => {
   await connectDB();

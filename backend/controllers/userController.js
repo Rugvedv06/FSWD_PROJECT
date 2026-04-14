@@ -2,10 +2,9 @@ import User from '../models/User.js';
 
 export const getUserProfile = async (req, res) => {
   try {
-    // For now, we just get the first user since there's no auth
-    let user = await User.findOne();
+    const user = await User.findById(req.userId);
     if (!user) {
-      user = await User.create({ name: 'User', monthlyIncome: 5000 });
+      return res.status(404).json({ success: false, error: 'User not found' });
     }
     res.status(200).json({ success: true, data: user });
   } catch (error) {
@@ -16,11 +15,14 @@ export const getUserProfile = async (req, res) => {
 export const updateIncome = async (req, res) => {
   try {
     const { monthlyIncome } = req.body;
-    let user = await User.findOneAndUpdate(
-      {},
+    const user = await User.findByIdAndUpdate(
+      req.userId,
       { monthlyIncome },
-      { new: true, upsert: true, runValidators: true }
+      { new: true, runValidators: true }
     );
+    if (!user) {
+      return res.status(404).json({ success: false, error: 'User not found' });
+    }
     res.status(200).json({ success: true, data: user });
   } catch (error) {
     res.status(400).json({ success: false, error: error.message });
